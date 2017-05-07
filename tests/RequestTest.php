@@ -523,6 +523,8 @@ class RequestTest extends TestCase
     }
 
     /**
+     * A media type parser must not return a scalar
+     *
      * @expectedException \RuntimeException
      */
     public function testGetParsedBodyWithParseError()
