@@ -726,6 +726,20 @@ class Request extends Message implements ServerRequestInterface
     }
 
     /**
+     * Force Body to be parsed again.
+     *
+     * Note: This method is not part of the PSR-7 standard.
+     *
+     * @return $this
+     */
+    public function reparseBody()
+    {
+        $this->bodyParsed = false;
+
+        return $this;
+    }
+
+    /**
      * Get request content type.
      *
      * Note: This method is not part of the PSR-7 standard. However,
