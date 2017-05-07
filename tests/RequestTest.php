@@ -566,6 +566,42 @@ class RequestTest extends TestCase
         $this->assertEquals([], $clone->getParsedBody());
     }
 
+    public function testWithParsedBodyNull()
+    {
+        $method = 'GET';
+        $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
+        $headers = new Headers();
+        $headers->set('Content-Type', 'application/x-www-form-urlencoded;charset=utf8');
+        $cookies = [];
+        $serverParams = [];
+        $body = new RequestBody();
+        $body->write('foo=bar');
+        $request = new Request($method, $uri, $headers, $cookies, $serverParams, $body);
+
+
+        $clone = $request->withParsedBody(null);
+
+        $this->assertNull($clone->getParsedBody());
+    }
+
+    public function testGetParsedBodyReturnsNullWhenThereIsNoBodyData()
+    {
+        $request = $this->requestFactory(['REQUEST_METHOD' => 'POST']);
+
+        $this->assertNull($request->getParsedBody());
+    }
+
+    public function testGetParsedBodyReturnsNullWhenThereIsNoMediaTypeParserRegistered()
+    {
+        $request = $this->requestFactory([
+            'REQUEST_METHOD' => 'POST',
+            'CONTENT_TYPE' => 'text/csv',
+        ]);
+        $request->getBody()->write('foo,bar,baz');
+
+        $this->assertNull($request->getParsedBody());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
