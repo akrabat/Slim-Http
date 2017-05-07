@@ -149,22 +149,28 @@ class Request extends Message implements ServerRequestInterface
         }
 
         $this->registerMediaTypeParser('application/json', function ($input) {
-            return json_decode($input, true);
-        });
-
-        $this->registerMediaTypeParser('application/xml', function ($input) {
-            $backup = libxml_disable_entity_loader(true);
-            $result = simplexml_load_string($input);
-            libxml_disable_entity_loader($backup);
+            $result = json_decode($input, true);
+            if (!is_array($result)) {
+                return null;
+            }
             return $result;
         });
 
-        $this->registerMediaTypeParser('text/xml', function ($input) {
+
+        $xmlMediaTypeParser = function ($input) {
             $backup = libxml_disable_entity_loader(true);
+            $backup_errors = libxml_use_internal_errors(true);
             $result = simplexml_load_string($input);
             libxml_disable_entity_loader($backup);
+            libxml_clear_errors();
+            libxml_use_internal_errors($backup_errors);
+            if ($result === false) {
+                return null;
+            }
             return $result;
-        });
+        };
+        $this->registerMediaTypeParser('application/xml', $xmlMediaTypeParser);
+        $this->registerMediaTypeParser('text/xml', $xmlMediaTypeParser);
 
         $this->registerMediaTypeParser('application/x-www-form-urlencoded', function ($input) {
             parse_str($input, $data);
