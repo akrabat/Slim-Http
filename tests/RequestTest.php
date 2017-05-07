@@ -548,6 +548,24 @@ class RequestTest extends TestCase
         $this->assertAttributeEquals(['xyz' => '123'], 'bodyParsed', $clone);
     }
 
+    public function testWithParsedBodyEmptyArray()
+    {
+        $method = 'GET';
+        $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
+        $headers = new Headers();
+        $headers->set('Content-Type', 'application/x-www-form-urlencoded;charset=utf8');
+        $cookies = [];
+        $serverParams = [];
+        $body = new RequestBody();
+        $body->write('foo=bar');
+        $request = new Request($method, $uri, $headers, $cookies, $serverParams, $body);
+
+
+        $clone = $request->withParsedBody([]);
+
+        $this->assertEquals([], $clone->getParsedBody());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
